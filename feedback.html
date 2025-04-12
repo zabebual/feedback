@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>School Behavior Feedback</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .star {
+            font-size: 30px;
+            cursor: pointer;
+            color: #ddd;
+        }
+
+        .star.active,
+        .star:hover {
+            color: #ffc107;
+        }
+
+        button {
+            display: block;
+            margin: 25px auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Weekly Student Behavior Feedback</h1>
+
+    <form id="feedbackForm" onsubmit="sendEmail(); return false;">
+        <div class="section" data-question="followInstructions">
+            <h3>1. Strictly follow instructions</h3>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+        </div>
+
+        <div class="section" data-question="stayFocused">
+            <h3>2. Avoid distractions and stay focused</h3>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+        </div>
+
+        <div class="section" data-question="organized">
+            <h3>3. Be well organized</h3>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+        </div>
+
+        <div class="section" data-question="transitions">
+            <h3>4. Show good class transitions</h3>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+        </div>
+
+        <div class="section" data-question="respect">
+            <h3>5. Always respect others</h3>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+        </div>
+
+        <button type="submit">Submit Weekly Feedback</button>
+    </form>
+
+    <script>
+        emailjs.init('QduWkfmWVWG1UXlRo');
+
+        const ratings = {};
+
+        document.querySelectorAll('.section').forEach(section => {
+            const stars = section.querySelectorAll('.star');
+            const question = section.dataset.question;
+
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    ratings[question] = star.dataset.value;
+                    stars.forEach((s, i) => {
+                        s.classList.toggle('active', i <= index);
+                    });
+                });
+            });
+        });
+
+        async function sendEmail() {
+            const requiredQuestions = ['followInstructions', 'stayFocused', 'organized', 'transitions', 'respect'];
+            
+            // Check if all ratings are provided
+            for (let q of requiredQuestions) {
+                if (!ratings[q]) {
+                    alert("Please rate all items before submitting!");
+                    return;
+                }
+            }
+
+            const formData = {
+                to_name: "Jenai Hess",
+                to_email: "hessj@fpsct.org",
+                parent_email: "zabebual@gmail.com",
+                bcc: "abebualzerihun@gmail.com,azeb.adhanom@gmail.com",
+                child_name: "Zemma Zerihun",
+                followInstructions: ratings.followInstructions,
+                stayFocused: ratings.stayFocused,
+                organized: ratings.organized,
+                transitions: ratings.transitions,
+                respect: ratings.respect,
+                week_ending: new Date().toLocaleDateString()
+            };
+
+            try {
+                await emailjs.send('service_84uxhjv', 'template_p2evqsp', formData);
+                alert('✅ Feedback submitted successfully!');
+                document.getElementById('feedbackForm').reset();
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+            } catch (error) {
+                alert(`❌ Error: ${error.text || error.message}`);
+            }
+        }
+    </script>
+</body>
+
+</html>
